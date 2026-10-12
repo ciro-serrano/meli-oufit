@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { getProduct } from "../api";
 import { formatPrice } from "../utils";
 import { useCart } from "../context/CartContext";
+import { thumb } from "../utils";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -99,7 +100,7 @@ export default function ProductPage() {
         <div className="gallery">
           <img
             className="gallery-main"
-            src={images[imgIndex]?.url}
+            src={thumb(images[imgIndex]?.url, 900)}
             alt={product.name}
           />
           {images.length > 1 && (
@@ -112,7 +113,7 @@ export default function ProductPage() {
                   aria-label={`Ver foto ${i + 1}`}
                   onClick={() => setImgIndex(i)}
                 >
-                  <img src={img.url} alt="" />
+                  <img src={thumb(img.url, 120)} alt="" />
                 </button>
               ))}
             </div>

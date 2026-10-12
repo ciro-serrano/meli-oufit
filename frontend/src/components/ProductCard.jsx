@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { formatPrice } from "../utils";
+import { thumb } from "../utils";
 
 export default function ProductCard({ product }) {
   return (
@@ -7,7 +8,7 @@ export default function ProductCard({ product }) {
       <article className="card">
         <img
           className="card-img"
-          src={product.image}
+          src={thumb(product.image, 500)}
           alt={product.name}
           loading="lazy"
         />
