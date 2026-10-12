@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getCategories } from "../api";
 import { adminFetch } from "../adminApi";
 import { useAuth } from "../context/AuthContext";
+import PhotoPicker from "../components/PhotoPicker.jsx";
 
 const SIZE_OPTIONS = [
   "XS",
@@ -88,6 +89,8 @@ export default function AdminProductForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [existingPhotos, setExistingPhotos] = useState([]);
+  const [pendingPhotos, setPendingPhotos] = useState([]);
 
   useEffect(() => {
     let ignore = false;
@@ -98,7 +101,10 @@ export default function AdminProductForm() {
       .then(([cats, product]) => {
         if (ignore) return;
         setCategories(cats);
-        if (product) setForm(fromProduct(product));
+        if (product) {
+          setForm(fromProduct(product));
+          setExistingPhotos(product.images || []);
+        }
       })
       .catch((e) => {
         if (ignore) return;
@@ -198,9 +204,34 @@ export default function AdminProductForm() {
 
     setSaving(true);
     try {
-      if (isEdit)
+      let savedId = id;
+
+      if (isEdit) {
         await adminFetch(`/api/admin/products/${id}`, { method: "PUT", body });
-      else await adminFetch("/api/admin/products", { method: "POST", body });
+      } else {
+        const created = await adminFetch("/api/admin/products", {
+          method: "POST",
+          body,
+        });
+        savedId = created.id; // en producto nuevo, lo devuelve el backend
+      }
+
+      // `savedId` = id del producto recién creado, o el id que ya estás editando
+      if (pendingPhotos.length) {
+        const fd = new FormData();
+        pendingPhotos.forEach((p) => fd.append("images", p.file));
+        try {
+          await adminFetch(`/api/admin/products/${savedId}/images`, {
+            method: "POST",
+            body: fd,
+          });
+        } catch (err) {
+          // El producto YA quedó guardado: llevamos a Melina a editarlo
+          // para que reintente solo las fotos (y no cree un duplicado).
+          navigate(`/admin/productos/${savedId}`);
+          return;
+        }
+      }
       navigate("/admin");
     } catch (err) {
       if (err.status === 401) logout();
@@ -234,6 +265,23 @@ export default function AdminProductForm() {
       <h2 className="page-title">
         {isEdit ? "Editar producto" : "Nuevo producto"}
       </h2>
+      <PhotoPicker
+        existing={existingPhotos}
+        pending={pendingPhotos}
+        onAdd={(nuevas) => setPendingPhotos((prev) => [...prev, ...nuevas])}
+        onRemovePending={(key) =>
+          setPendingPhotos((prev) => prev.filter((p) => p.key !== key))
+        }
+        onRemoveExisting={async (id) => {
+          if (!window.confirm("¿Quitar esta foto?")) return;
+          try {
+            await adminFetch(`/api/admin/images/${id}`, { method: "DELETE" });
+            setExistingPhotos((prev) => prev.filter((p) => p.id !== id));
+          } catch (err) {
+            setError(err.message);
+          }
+        }}
+      />
 
       <form onSubmit={handleSubmit} className="form">
         <label className="field">
