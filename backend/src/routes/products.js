@@ -22,11 +22,11 @@ router.get("/", async (req, res) => {
     const params = [];
 
     if (gender) {
-      sql += " AND p.gender = ?";
+      sql += " AND p.gender IN (?, 'unisex')";
       params.push(gender);
     }
     if (season) {
-      sql += " AND p.season = ?";
+      sql += " AND p.season IN (?, 'todo_el_anio')";
       params.push(season);
     }
     if (category) {
