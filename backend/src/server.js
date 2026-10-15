@@ -13,7 +13,14 @@ if (!process.env.JWT_SECRET) {
 }
 
 const app = express();
-app.use(cors());
+app.set("trust proxy", 1);
+const allowedOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+// Sin FRONTEND_URL (tu PC) acepta cualquier origen; en producción, solo el de Vercel
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true }));
 app.use(express.json());
 app.use("/api/products", productsRouter);
 app.use("/api/auth", authRouter);
