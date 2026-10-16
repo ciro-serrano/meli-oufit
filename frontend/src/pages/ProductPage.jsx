@@ -5,13 +5,13 @@ import { formatPrice } from "../utils";
 import { useCart } from "../context/CartContext";
 import { thumb } from "../utils";
 import toast from "react-hot-toast";
+import Gallery from "../components/Gallery";
 
 export default function ProductPage() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [imgIndex, setImgIndex] = useState(0);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const { addItem, items } = useCart();
@@ -20,7 +20,6 @@ export default function ProductPage() {
     let ignore = false;
     setLoading(true);
     setError("");
-    setImgIndex(0);
 
     getProduct(slug)
       .then((data) => {
@@ -94,28 +93,7 @@ export default function ProductPage() {
       </Link>
 
       <div className="product-layout">
-        <div className="gallery">
-          <img
-            className="gallery-main"
-            src={thumb(images[imgIndex]?.url, 900)}
-            alt={product.name}
-          />
-          {images.length > 1 && (
-            <div className="thumbs">
-              {images.map((img, i) => (
-                <button
-                  key={img.position}
-                  type="button"
-                  className={`thumb ${i === imgIndex ? "active" : ""}`}
-                  aria-label={`Ver foto ${i + 1}`}
-                  onClick={() => setImgIndex(i)}
-                >
-                  <img src={thumb(img.url, 120)} alt="" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <Gallery key={product.id} images={images} alt={product.name} />
 
         <div className="product-info">
           <h2 className="product-name">{product.name}</h2>
