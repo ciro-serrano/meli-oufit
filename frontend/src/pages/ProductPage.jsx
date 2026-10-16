@@ -4,6 +4,7 @@ import { getProduct } from "../api";
 import { formatPrice } from "../utils";
 import { useCart } from "../context/CartContext";
 import { thumb } from "../utils";
+import toast from "react-hot-toast";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -14,7 +15,6 @@ export default function ProductPage() {
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const { addItem, items } = useCart();
-  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -46,9 +46,6 @@ export default function ProductPage() {
     };
   }, [slug]);
   // Si cambia de talle, color o producto, borramos el aviso "Agregado"
-  useEffect(() => {
-    setAdded(false);
-  }, [size, color, slug]);
 
   if (loading) return <p className="status">Cargando…</p>;
   if (error || !product)
@@ -87,7 +84,7 @@ export default function ProductPage() {
       image: images[0]?.url,
       stock: selected.stock,
     });
-    setAdded(true);
+    toast.success("Agregado al carrito");
   };
 
   return (
@@ -167,15 +164,7 @@ export default function ProductPage() {
             </div>
           )}
 
-          <p className="stock-msg">
-            {added ? (
-              <>
-                Agregado al carrito. <Link to="/carrito">Ver carrito</Link>
-              </>
-            ) : (
-              stockMsg
-            )}
-          </p>
+          <p className="stock-msg">{stockMsg}</p>
 
           <button
             type="button"

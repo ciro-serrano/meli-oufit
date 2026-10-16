@@ -7,10 +7,25 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminHome from "./pages/AdminHome";
 import RequireAdmin from "./components/RequireAdmin";
 import AdminProductForm from "./pages/AdminProductForm";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
     <>
+      <Toaster
+        position="top-center"
+        containerStyle={{ top: 72 }} // altura del header + un respiro
+        toastOptions={{
+          duration: 2500,
+          style: {
+            background: "#FBF4EC",
+            color: "#5C1A2B",
+            border: "1px solid #3F7D58",
+            fontFamily: "Jost, sans-serif",
+          },
+          success: { iconTheme: { primary: "#3F7D58", secondary: "#FBF4EC" } },
+        }}
+      />
       <Header />
       <Routes>
         <Route path="/" element={<Catalog />} />
