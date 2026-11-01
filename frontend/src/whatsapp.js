@@ -1,11 +1,12 @@
-import { formatPrice } from "./utils";
+import { formatPrice, thumb } from "./utils";
 
 const PHONE = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 export function buildWhatsAppUrl(items, total) {
   const lines = items.map((i) => {
     const detail = [i.size, i.color].filter((v) => v !== "Único").join(", ");
-    return `• ${i.qty} x ${i.name}${detail ? ` (${detail})` : ""} - ${formatPrice(i.price * i.qty)}`;
+    const line = `• ${i.qty} x ${i.name}${detail ? ` (${detail})` : ""} - ${formatPrice(i.price * i.qty)}`;
+    return i.image ? `${line}\nFoto: ${thumb(i.image, 600)}` : line;
   });
 
   const text = [
