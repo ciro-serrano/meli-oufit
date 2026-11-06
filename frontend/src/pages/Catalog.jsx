@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Filters from "../components/Filters";
 import ProductCard from "../components/ProductCard";
 import { getProducts, getCategories } from "../api";
+import ProductSkeleton from "../components/ProductSkeleton";
 
 const EMPTY_FILTERS = { gender: "", season: "", category: "" };
 
@@ -11,6 +12,7 @@ export default function Catalog() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [slow, setSlow] = useState(false);
 
   useEffect(() => {
     getCategories()
@@ -39,6 +41,15 @@ export default function Catalog() {
     };
   }, [filters]);
 
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setSlow(true), 8000);
+    return () => {
+      clearTimeout(t);
+      setSlow(false);
+    };
+  }, [loading]);
+
   return (
     <main className="container">
       <Filters
@@ -47,7 +58,20 @@ export default function Catalog() {
         onChange={setFilters}
       />
 
-      {loading && <p className="status">Cargando productos…</p>}
+      {loading && (
+        <>
+          {slow && (
+            <p className="status" role="status">
+              Estamos preparando la tienda, un momento…
+            </p>
+          )}
+          <div className="grid" aria-busy="true">
+            {Array.from({ length: 8 }, (_, i) => (
+              <ProductSkeleton key={i} />
+            ))}
+          </div>
+        </>
+      )}
       {error && <p className="status">{error}</p>}
       {!loading && !error && products.length === 0 && (
         <p className="status">No hay productos con esos filtros.</p>

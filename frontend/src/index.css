@@ -742,6 +742,7 @@ a.link-btn {
   aspect-ratio: 3 / 4;
   object-fit: cover;
 }
+
 /* Pantallas más grandes */
 @media (min-width: 768px) {
   .grid {
@@ -761,5 +762,37 @@ a.link-btn {
 @media (min-width: 1024px) {
   .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, #efd8d3 25%, #f7e9e4 50%, #efd8d3 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+.skeleton.card-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: 12px;
+}
+.skeleton-line {
+  height: 14px;
+  margin-top: 10px;
+}
+.skeleton-line.short {
+  width: 40%;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
   }
 }
